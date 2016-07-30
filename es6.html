@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=sons-of-obsidian"></script>
+
+    <!--script type="text/javascript" src="js/shCore.js"></script>
+    <script type="text/javascript" src="js/shBrushJScript.js"></script>
+    <link href="css/shCore.css" rel="stylesheet" type="text/css" />
+    <link type="text/css" rel="Stylesheet" href="css/shThemeEmacs.css"/-->
+
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>ECMAscript 6</title>
+  </head>
+  <body>
+    <h1>ECMAscript 6</h1>
+    <p>ECMAscript 6, as a starndard, is being implemented gradually by
+    browsers and other software. Some browsers already implement some
+    of the features and eventualy they will implement the whole
+    standard (there are always cases, such as IE, where they don't,
+    but this another matter). Take a look to this page to see the
+    degree of support:
+    <a href="http://kangax.github.io/compat-table/es6/" target="_new">http://kangax.github.io/compat-table/es6/</a>.</p>
+    <h2>Constant variables</h2>
+    <pre class="prettyprint">
+    <!--pre class="brush: js"-->
+const PI = 3.14159;
+    </pre>
+    <p>A <b>TypeError</b> exception is thrown when trying to assign a
+    new value, or when trying to
+    declare a var with the same name.
+    <h2>Block-scoped variables</h2>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+    target="_new">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let</a>
+    <p>Use the syntax <b>let</b> to declare a variable's scope as
+    the current block (expression or statement) and sub-scopes. 
+    <!--pre class="brush: js; highlight: [11, 13]"-->
+    <pre class="prettyprint lang=html linenums=true">
+function varTest() {
+  var x = 1;
+  if (true) {
+    var x = 2;  // same variable!
+    console.log(x);  // 2
+  }
+  console.log(x);  // 2
+}
+
+function letTest() {
+  let x = 1;
+  if (true) {
+    let x = 2;  // different variable
+    console.log(x);  // 2
+  }
+  console.log(x);  // 1
+}
+    </pre>
+    <h3>Juicy cases</h3>
+    <pre class="prettyprint lang=html linenums=true">
+var list = document.getElementById("list");
+
+for (let i = 1; i <= 5; i++) {
+  let item = document.createElement("li");
+  item.appendChild(document.createTextNode("Item " + i));
+
+  item.onclick = function (ev) {
+    console.log("Item " + i + " is clicked.");
+  };
+  list.appendChild(item);
+}
+    </pre>
+    <p>This code behaves as expected (we have an index in <b>i</b>)
+    but because <b>i</b> has block scope, every instance of the
+    anonymous function will have a different value of <b>i</b>. If
+    instead of <b>let</b> we had <b>var</b> every single value
+    of <b>i</b> would be 6 (the last one).</p>
+    <pre class="prettyprint lang=html linenums=true">
+function do_something() {
+  console.log(foo); // ReferenceError
+  let foo = 2;
+}
+    </pre>
+    <p>MDN says <b>let</b> hoists the variable declaration, but there is a
+    "Temporal dead zone" for <b>foo</b> all the way down up to line 3
+    in the code above. I don't see how it is hoisted if you can't use it before its declaration, then it is
+    not <b>hoisting</b> as far as I know.</p>
+<h2>Arrow functions</h2>
+<p>The main motivation for using arrow functions is to simplify the
+  use of function expressions, such as the ones found in callbacks or
+  the ones used to treat arrays with <b>Array.map()</b>. It is meant
+  to  remove <b>function</b> and <b>return</b>, what should be
+  clearer than the old boilerplate function
+  definition.
+<p>Another functionality is
+  the lexical <b>this</b> value inside the arrow function
+  expression/statements (explained later on).</p>
+<h3>Syntax (from MDN)</h3>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+   target="_new">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions</a>
+<pre class="syntax">
+(param1, param2, ..., paramN) => { statements }
+(param1, param2, ..., paramN) => expression
+         // equivalent to:  => { return expression; }
+
+// Parentheses are optional when there's only one parameter:
+(singleParam) => { statements }
+singleParam => { statements }
+
+// A function with no parameters requires parentheses:
+() => { statements }
+
+// Parenthesize the body to return an object literal expression:
+params => ({foo: bar})
+</pre>
+<p>See this other
+   article as well:</p><a href="https://ariya.io/2013/02/es6-and-arrow-function" target="_new">https://ariya.io/2013/02/es6-and-arrow-function</a>
+<pre class="prettyprint lang=html linenums=true">
+var odds = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21];
+var evens = odds.map(val => val + 1);
+var pairs = odds.map(val => ({ odd: val, even: val + 1 }));
+
+var nums = [1, 4, 9, 16];
+var roots = nums.map(Math.sqrt);
+</pre>
+<p>The following is a very poor usage of the arrow functions but it
+  will illustrate te use of multiple parametres. In the case of our
+  business logic it could be useful for field validation in a form
+  (for each field call the validate function).</p>
+ 
+<pre class="prettyprint lang=html linenums=true">
+var binaryMembers = [ 1, 0, 1, 1];
+var decimal = binaryMembers.reduce((prevVal, currentVal, index, arr) => prevVal + currentVal*Math.pow(2,arr.length-(index+1)), 0);
+</pre>
+<p>This is before  arow functions:</p>
+<pre class="prettyprint lang=html linenums=true">
+var odds = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21];
+var evens = odds.map(function (val) { return val + 1; });
+var pairs = odds.map(function (val) { return { odd: val, even: val + 1 }; });
+
+var nums = [1, 4, 9, 16];
+var roots = nums.map(function (val) { return Math.sqrt(val); });
+
+var binaryMembers = [ 1, 0, 1, 1];
+var decimal = binaryMembers.reduce(function(prevVal, currentVal, index, arr){ return  prevVal + currentVal*Math.pow(2,arr.length-(index+1))}, 0);
+</pre>
+<p>Another new feature (or THE new feature in arrow functions) is the
+  value of <b>this</b> inside the arrow function. Take a look to this
+  explanation
+  of <b>this</b> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+  target="_new">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions</a></p>
+<p>BTW, the fibonacci series are implemented either with recursion or
+    with an ever increasing array. None of them are good examples for arrow
+    functions that are intended for function expressions. This is my
+    trial:</p>
+<a href="lib/fib.js" target="_new">lib/fib.js</a>
+<h1>Default parameter values</h1>
+<pre class="prettyprint lang=html linenums=true">
+function f (x, y = 7, z = 42) {
+    return x + y + z;
+}
+f(1) === 50;
+</pre>
+<h1>Rest parameter</h1>
+<p>Aggregation of the remaining parameters on a function</p>
+<pre class="prettyprint lang=html linenums=true">
+function f (x, y, ...a) {
+    return (x + y) * a.length;
+}
+f(1, 2, "hello", true, 7) === 9;
+</pre>
+<h1>Spread operator</h1>
+<p>The spread operator allows an expression to be expanded in places
+  where multiple arguments (for function calls) or multiple elements
+  (for array literals) or multiple variables (for destructuring assignment) are expected.</p>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator"
+  target="_new">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator</a>
+<pre class="prettyprint lang=html linenums=true">
+function myFunction(x, y, z) {
+    console.log(`x:${x} , y:${y} , z:${z}`);
+}
+var args = [0, 1, 2];
+myFunction(...args);
+
+var parts = ['shoulders', 'knees'];
+var lyrics = ['head', ...parts, 'and', 'toes']; // ["head", "shoulders", "knees", "and", "toes"]
+
+//a funny one
+var str = "foo";
+var chars = [ ...str ] // [ "f", "o", "o" ];
+</pre>
+
+<h1>Template literals</h1>
+<h3>Syntax</h3>
+<pre class="syntax">
+`string text ${expression} string text`
+
+tag `string text ${expression} string text`
+</pre>
+<p>A template literal is defined with the <b>agrave</b> symbol. It's
+  not a single quote and double quotes don't work here. Optionally
+  one can define a tag. The benefit of template literals is that one
+  can use the <b>${}</b> notation to print the value of any expression.</p>
+<p>Take a closer look to myFunction() on the previous snipet.</p>
+<pre class="prettyprint lang=html linenums=true">
+var template = (strings, ...keys) => { 
+    console.log(strings);
+    console.log(keys); 
+};
+template `This is a number: ${13}, and this is a boolean: ${false}`;
+</pre>
+<p>As you can see the tag function gets as a parameter a string array
+  and all the individual keys separately.</p>
+
+<h1>Extended literals</h1>
+<pre class="prettyprint lang=html linenums=true">
+0b110101 === 53
+0o65 === 53
+</pre>
+<p>And unicode support for strings and
+    regexp.</p><a href="https://github.com/lukehoban/es6features#unicode" target="_new">https://github.com/lukehoban/es6features#unicode</a>
+
+<h1>Improved Regex</h1>
+<p>There has been improvements on the regex implementation, but I
+    haven't found any place stating any changes on its
+    usage.</p><a href="http://es6-features.org/#RegularExpressionStickyMatching"
+    target="_new">http://es6-features.org/#RegularExpressionStickyMatching</a>
+<h1>Enhanced object literals</h1>
+<p>In the context of objects literals there are a few new functionalities that make object
+  literals and classes behave more similarly. (a) Shorthand for <b>foo:
+  foo</b> type assignments, (b) defining methods, (c) making <b>super</b> calls, and
+  (d) computing property names with expressions are some of the new functionalities.</p>
+<a href="https://github.com/lukehoban/es6features#enhanced-object-literals" target="_new">https://github.com/lukehoban/es6features#enhanced-object-literals</a>
+<pre class="prettyprint lang=html linenums=true">
+var handler = x => x*x;
+var obj = {
+    // (a) Shorthand for 'handler: handler'
+    handler,
+    // (b) Methods
+    toString() {
+     // (c) Super calls
+     return "d " + super.toString();
+    },
+    // (d) Computed (dynamic) property names
+    [ 'prop_' + (() => 42)() ]: 42
+};
+</pre>
+<h1>Destructuring assignment</h1>
+<p>Conversion of arrays into individual variables (with
+  the <b>[&nbsp;]</b> notation).</p>
+<pre class="prettyprint lang=html linenums=true">
+var list = [ 1, 2, 3 ];
+var [ a, , b ] = list;
+[ b, a ] = [ a, b ];
+</pre>
+<p>Conversion of objects into individual variables (with the <b>{&nbsp;}</b> notation).</p>
+<pre class="prettyprint lang=html linenums=true">
+var car = {
+'make':'Ford',
+'model':'Prefect',
+'year':1938,
+'country': 'UK',
+'engine': {
+    'power':1172,
+    'cylinder':4
+    }
+};
+var { model, year, make } = car;
+
+var { engine: { power: power}, country: where } = car;
+</pre>
+<p>And fail-soft features (by providing default values):</p>
+<pre class="prettyprint lang=html linenums=true">
+var list = [ 7, 42 ];
+var [ a = 1, b = 2, c = 3, d ] = list;
+a === 7;
+b === 42;
+c === 3;
+d === undefined;
+</pre>
+<h1>Promises</h1>
+<p>Promises provide a way of using Javascript asynchronously by
+  creating an object (<b>Promise</b>) that will provide a result or will return an
+  error. The <b>Promise</b> object requires a function with 2
+  callbacks, <b>resolve</b> when the result is ready
+  and <b>reject</b> when there has been an error.</p>
+<h3>Syntax</h3>
+<pre class="syntax">
+new Promise( /* executor */ function(resolve, reject) { ... } );
+</pre>
+<p>See MDN for full
+  detail on the <b>Promise</b> object.</p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+  target="_new">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise</a>
+<pre class="prettyprint lang=html linenums=true">
+function delayedMessage (who, message, timeout) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(`${who}: ${message}.`), timeout)
+    });
+};
+
+delayedMessage('Arthur', 'I think that door just sighed', 2000).then((msg) => {
+    console.log(`${msg}`);
+    return delayedMessage('Marvin','Ghastly, isn\'t it? All the doors on this spaceship have been programmed to have a cheery and sunny disposition', 200);
+}).then((msg) => console.log(`${msg}`));
+console.log('This line is executed BEFORE we have a resolution of the "Promise"!');
+</pre>
+<h1>Modules</h1>
+<p>We can import and export objects and functions without polluting
+  the <b>global scope</b>. This feature, however, is not implemented
+  by any browser
+  (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+  target="_new">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import</a>).</p>
+<pre class="prettyprint lang=html linenums=true">
+//  lib/math.js
+export function sum (x, y) { return x + y };
+export var pi = 3.141593;
+
+//  someApp.js
+import * as math from "lib/math";
+console.log("2pi = " + math.sum(math.pi, math.pi));
+
+//  otherApp.js
+import { sum, pi } from "lib/math";
+console.log("2pi = " + sum(pi, pi));
+</pre>
+<h1>Classes</h1>
+<p>In ECMAscript 6 the class concept of OOP has been made easier and
+    more extensive. Clearer class defintions, constructors and
+    inheritance, getters & setters (already on ECMAscript 5).</p>
+<h2>Class definition</h2>
+<pre class="prettyprint lang=html linenums=true">
+class Human {
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    who() {
+        return this.name + " is " + this.age + " years old.";
+    }
+}
+let breddy = new Human("Breddy",24);
+console.log(breddy.who()); //Breddy is 24 years old.
+console.log(breddy instanceof Human); //true
+</pre>
+<h2>Inheritance</h2>
+<p>Notice the use of <b>this</b> and <b>super</b>.</p>
+<p>One can even inherit from Javascript built-in classes such as Object, Error, Array etc.</p>
+<pre class="prettyprint lang=html linenums=true">
+class Human {
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+ 
+    who() {
+        return this.name + " is " + this.age + " years old.";
+    }
+}
+ 
+class Student extends Human {
+    constructor(name, age, school) {
+        super(name, age);
+        this.school = school;
+    }
+    who() {
+        return super.who() + ' He goes to ' + this.school + " school.";
+    }
+}
+ 
+let breddy = new Student("Breddy",24,"Havard");
+console.log(breddy.who()); //Breddy is 24 years old. He goes to Havard school.
+console.log(breddy instanceof Student); //true
+</pre>
+<h2>Getters & setters</h2>
+<pre class="prettyprint lang=html linenums=true">
+class MyClass {
+    get prop() {
+        return 'getter';
+    }
+    set prop(value) {
+        console.log('setter: '+ value);
+    }
+}
+ 
+let inst = new MyClass();
+inst.prop = 123; //setter: 123
+console.log(inst.prop) //getter
+</pre>
+<h2>Static methods</h2>
+<pre class="prettyprint lang=html linenums=true">
+class MyClass {
+    constructor(prop) {
+        this.prop = prop;
+    }
+    static staticMethod() {
+        return 'I am static';
+    }
+    normalMethod() {
+        return 'I am NOT Static';
+    }
+}
+let inst = new MyClass(123);
+
+console.log(inst.normalMethod()); //I am NOT Static
+console.log(MyClass.staticMethod()); //I am static
+
+console.log(MyClass.normalMethod()); //Error: normalMethod is not a function
+
+console.log(MyClass.prototype.normalMethod()); //I am NOT Static
+</pre> 
+    <!--script type="text/javascript">
+     SyntaxHighlighter.all()
+    </script-->
+  </body>
+</html>
